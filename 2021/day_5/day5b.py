@@ -1,8 +1,4 @@
 import numpy as np
-import math
-
-
-#TODO: sumething is not right with my indexes, just made them bigger
 
 def minMax(data):
     xMin = data[0][0]; xMax = data[0][0]
@@ -17,36 +13,36 @@ def minMax(data):
     return [xMin, xMax, yMin, yMax]
 
 
-def findStraightLines(fromPoint, toPoint):
-    
+def findVertLines(fromPoint, toPoint):
     entries = len(fromPoint)
-
     fromPoints = []
     toPoints = []
     for line in range(entries):
-        if (toPoint[line][0] - fromPoint[line][0] == 0) or (toPoint[line][1] - fromPoint[line][1] == 0):
+        if (toPoint[line][0] == fromPoint[line][0]):
             fromPoints.append(fromPoint[line])
             toPoints.append(toPoint[line])
-
     return fromPoints, toPoints
 
-def findIncrement(fromPoints, toPoints):
-
-    increment = []
-    entries = len(fromPoints)
+def findHorLines(fromPoint, toPoint):
+    entries = len(fromPoint)
+    fromPoints = []
+    toPoints = []
     for line in range(entries):
-        # find increment
-        dx = toPoints[line][0] - fromPoints[line][0]
-        if dx != 0:
-            dx = dx/abs(dx)
+        if (toPoint[line][1] == fromPoint[line][1]):
+            fromPoints.append(fromPoint[line])
+            toPoints.append(toPoint[line])
+    return fromPoints, toPoints
 
-        dy = toPoints[line][1] - fromPoints[line][1]
-        if dy != 0:
-            dy = dy/abs(dy)
+def findDiagLines(fromPoint, toPoint):
+    entries = len(fromPoint)
+    fromPoints = []
+    toPoints = []
+    for line in range(entries):
+        if (toPoint[line][0] != fromPoint[line][0]) and (toPoint[line][1] != fromPoint[line][1]):
+            fromPoints.append(fromPoint[line])
+            toPoints.append(toPoint[line])
+    return fromPoints, toPoints
 
-        increment.append([int(dx), int(dy)])
-
-    return increment
 
 # Read and prepare data
 # ---------------------
@@ -82,32 +78,68 @@ yMax = max(yMaxFrom, yMaxTo)
 # Grid
 grid = np.zeros(((yMax - yMin + 100), (xMax - xMin + 100)))
 
-# Filter to straight lines only
-fromPoints, toPoints = findStraightLines(fromPoints, toPoints)  
+# find and add vertical lines
+# ---------------------------
+fromPointsV, toPointsV = findVertLines(fromPoints, toPoints)  
 
-# Find increments
-increments = findIncrement(fromPoints, toPoints)
-
-# Plot lines
-for i in range(len(fromPoints)):
-
-    print('Line:', i)
-
-    point = fromPoints[i]
-
+entities = len(fromPointsV)
+for i in range(0, entities):
+    point = fromPointsV[i].copy()
     run = True
     while run:
-        print(toPoints[i], point[0], point[1])
         grid[point[1], point[0]] += 1
+        diff = toPointsV[i][1] - fromPointsV[i][1] 
+        dh = int(diff / abs(diff))
+        point[1] += dh
 
-        if (point[0] == toPoints[i][0]) and (point[1] == toPoints[i][1]):
+        if point[1] == toPointsV[i][1]:
+            grid[toPointsV[i][1], toPointsV[i][0]] += 1
             run = False
-        else:
-            point[0] = point[0] + increments[i][0]
-            point[1] = point[1] + increments[i][1] 
 
+# find and add horizontal lines
+# -----------------------------
+fromPointsH, toPointsH = findHorLines(fromPoints, toPoints)  
 
+entities = len(fromPointsH)
+for i in range(0, entities):
+    point = fromPointsH[i].copy()
+    run = True
+    while run:
+        grid[point[1], point[0]] += 1
+        diff = toPointsH[i][0] - fromPointsH[i][0] 
+        dh = int(diff / abs(diff))
+        point[0] += dh
+
+        if point[0] == toPointsH[i][0]:
+            grid[toPointsH[i][1], toPointsH[i][0]] += 1
+            run = False
+
+# Find and add diagonal lines
+# ---------------------------
+# -----------------------------
+fromPointsD, toPointsD = findDiagLines(fromPoints, toPoints) 
+
+entities = len(fromPointsD)
+for i in range(0, entities):
+    point = fromPointsD[i].copy()
+    run = True
+    while run:
+        grid[point[1], point[0]] += 1
+        
+        diffr = toPointsD[i][0] - fromPointsD[i][0] 
+        dhr = int(diffr / abs(diffr))
+        point[0] += dhr
+
+        diffc = toPointsD[i][1] - fromPointsD[i][1] 
+        dhc = int(diffc / abs(diffc))
+        point[1] += dhc
+
+        if (point[0] == toPointsD[i][0]) or (point[1] == toPointsD[i][1]):
+            grid[toPointsD[i][1], toPointsD[i][0]] += 1
+            run = False
+        
 
 print(grid)
+
 
 print('Answer:', len(grid[grid>=2]))
