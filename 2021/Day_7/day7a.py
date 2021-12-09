@@ -6,7 +6,6 @@ def calcCost(distances, reference):
         cost += abs(distance - reference) 
     return cost
 
-
 # Run problem
 # -----------
 
@@ -18,13 +17,12 @@ data = [int(i) for i in data[0].split(',')]
 # Find optimal value
 # ------------------
 # check up
-loc = statistics.mode(data)
+loc = 5 #statistics.median(data)
 cost = calcCost(data, loc)
 run = True
 while run:
     loc += 1
     costNew = calcCost(data, loc)
-    print(costNew)
 
     if costNew > cost:
         run = False
@@ -34,7 +32,7 @@ while run:
 print(loc, cost)
 
 # check down
-loc = statistics.mode(data)
+loc = 5# statistics.median(data)
 cost = calcCost(data, loc)
 run = True
 while run:
