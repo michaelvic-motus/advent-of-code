@@ -5,7 +5,7 @@ import numpy as np
 # -----------
 
 # Create board
-with open('test1_input.txt') as f:
+with open('input.txt') as f:
     data = f.readlines()
 
 dataNew = []
@@ -30,23 +30,71 @@ adjCorners = [
     [data[-1, -2], data[-2, -1]]# right bottom
     ] 
 
-for idx, corner in enumerate(corners):
+for idx, item in enumerate(corners):
     adj = np.array(adjCorners[idx])
-    if len(adj[adj > corner]) == 2:
-        score += 1 + corner
+    if len(adj[adj > item]) == 2:
+        print(item)
+        score += 1 + item
         #print(idx, corner, score)
 
-# Search top
+# Search top row
+icol = 1
 topRow = data[0, 1:-1]
-print(topRow)
+for item in topRow:    
+    adj = np.array([data[0, icol - 1], data[0, icol + 1], data[1, icol]])
+    if len(adj[adj > item]) == 3:
+        print(item)
+        score += 1 + item
+    icol += 1
 
-# search bottom
-
+# Search bottom
+icol = 1
+btmRow = data[-1, 1:-1]
+for item in btmRow:   
+    adj = np.array([
+        data[-1, icol - 1],#  left
+        data[-1, icol + 1],# right
+        data[-2, icol]]# above
+    )
+    if len(adj[adj > item]) == 3:
+        print(item)
+        score += 1 + item
+    icol += 1
+    
 # Search left
+icol = 1
+leftRow = data[1:-1, 0]
+for item in leftRow:   
+    adj = np.array([data[icol - 1, 0], data[icol, 1], data[icol + 1, 0]])
+    if len(adj[adj > item]) == 3:
+        print(item)
+        score += 1 + item
+    icol += 1
 
 # Search right
-
+icol = 1
+rightRow = data[1:-1, -1]
+for item in rightRow:   
+    adj = np.array([data[icol - 1, -1], data[icol, -2], data[icol + 1, -1]])
+    if len(adj[adj > item]) == 3:
+        print(item)
+        score += 1 + item
+    icol += 1
 
 # Search centre
+irow = 1
+centre = data[1:-1, 1:-1]
+for row in centre:
+    icol = 1
+    for item in row:
+        adj = np.array([data[irow-1, icol], data[irow+1, icol], data[irow, icol+1], data[irow, icol-1]]) 
+        if len(adj[adj > item]) == 4:
+            print(item)
+            score += 1 + item
+
+        icol += 1    
+    irow += 1
+    
+
 
 print('Score:', score)
